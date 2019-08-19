@@ -21,8 +21,6 @@ import (
 	"reflect"
 	"testing"
 
-	deployapi "github.com/openshift/origin/pkg/deploy/api"
-
 	"github.com/rdeusser/kompose/pkg/kobject"
 	"github.com/rdeusser/kompose/pkg/transformer"
 
@@ -381,24 +379,6 @@ func TestKomposeConvert(t *testing.T) {
 						t.Errorf("Expect selector be unset, got: %#v", rc.Spec.Selector)
 					}
 					foundRC = true
-				}
-			}
-			// TODO: k8s & openshift transformer is now separated; either separate the test or combine the transformer
-			if test.opt.CreateDeploymentConfig {
-				if dc, ok := obj.(*deployapi.DeploymentConfig); ok {
-					if err := checkPodTemplate(config, *dc.Spec.Template, labels); err != nil {
-						t.Errorf("%v", err)
-					}
-					if err := checkMeta(config, dc.ObjectMeta, name, true); err != nil {
-						t.Errorf("%v", err)
-					}
-					if (int)(dc.Spec.Replicas) != replicas {
-						t.Errorf("Expected %d replicas, got %d", replicas, dc.Spec.Replicas)
-					}
-					if len(dc.Spec.Selector) > 0 {
-						t.Errorf("Expect selector be unset, got: %#v", dc.Spec.Selector)
-					}
-					foundDC = true
 				}
 			}
 		}

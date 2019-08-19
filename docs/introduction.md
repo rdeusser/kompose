@@ -3,7 +3,7 @@
 
 ### What's Kompose?
 
-Kompose is a conversion tool for Docker Compose to container orchestrators such as Kubernetes (or OpenShift).
+Kompose is a conversion tool for Docker Compose to container orchestrators such as Kubernetes.
 
 Why do developers love it?
 

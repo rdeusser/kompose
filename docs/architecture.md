@@ -63,7 +63,7 @@ type ServiceConfig struct {
 
 ## Transformer
 
-Transformer takes KomposeObject and converts it to target/output format (at this moment, there are sets of kubernetes/openshift objects). Similar to `Loader`, Transformer is represented by a Transformer interface:
+Transformer takes KomposeObject and converts it to target/output format (at this moment, there are sets of kubernetes objects). Similar to `Loader`, Transformer is represented by a Transformer interface:
 
 ```go
 type Transformer interface {
@@ -71,12 +71,11 @@ type Transformer interface {
 }
 ```
 
-If you wish to add more providers which contain different kind of objects, transformer would be the place to look into. At this moment Kompose supports Kubernetes (by default) and Openshift providers. More details at:
+If you wish to add more providers which contain different kind of objects, transformer would be the place to look into. At this moment Kompose supports Kubernetes. More details at:
 
 * [kompose/pkg/transformer](https://github.com/kubernetes/kompose/tree/master/pkg/transformer)
 * [kompose/pkg/transformer/kubernetes](https://github.com/kubernetes/kompose/tree/master/pkg/transformer/kubernetes)
-* [kompose/pkg/transformer/openshift](https://github.com/kubernetes/kompose/tree/master/pkg/transformer/openshift)
 
 ## Outputter
 
-Outputter takes Transformer result and executes given action. For example action can be displaying result to stdout or directly deploying artifacts to Kubernetes/OpenShift.
+Outputter takes Transformer result and executes given action. For example action can be displaying result to stdout or directly deploying artifacts to Kubernetes.

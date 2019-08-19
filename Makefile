@@ -56,11 +56,6 @@ test-unit-cover:
 	go list -f '"go test -short -race -cover -v -coverprofile={{.Dir}}/.coverprofile {{.ImportPath}}"' github.com/kubernetes/kompose/...  | grep -v "vendor" | xargs -L 1 -P4 sh -c
 
 
-# run openshift up/down tests
-.PHONY: test-openshift
-test-openshift:
-	./script/test_in_openshift/run.sh
-
 # run commandline tests
 .PHONY: test-cmd
 test-cmd:

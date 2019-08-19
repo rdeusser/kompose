@@ -26,8 +26,6 @@ import (
 	"github.com/fatih/structs"
 	"github.com/rdeusser/kompose/pkg/kobject"
 	"github.com/rdeusser/kompose/pkg/transformer"
-	buildapi "github.com/openshift/origin/pkg/build/api"
-	deployapi "github.com/openshift/origin/pkg/deploy/api"
 	log "github.com/sirupsen/logrus"
 
 	// install kubernetes api
@@ -932,12 +930,6 @@ func (k *Kubernetes) UpdateController(obj runtime.Object, updateTemplate func(*a
 			return errors.Wrap(err, "updateTemplate failed")
 		}
 		updateMeta(&t.ObjectMeta)
-	case *deployapi.DeploymentConfig:
-		err = updateTemplate(t.Spec.Template)
-		if err != nil {
-			return errors.Wrap(err, "updateTemplate failed")
-		}
-		updateMeta(&t.ObjectMeta)
 	case *api.Pod:
 		p := api.PodTemplateSpec{
 			ObjectMeta: t.ObjectMeta,
@@ -949,8 +941,6 @@ func (k *Kubernetes) UpdateController(obj runtime.Object, updateTemplate func(*a
 		}
 		t.Spec = p.Spec
 		t.ObjectMeta = p.ObjectMeta
-	case *buildapi.BuildConfig:
-		updateMeta(&t.ObjectMeta)
 	}
 	return nil
 }

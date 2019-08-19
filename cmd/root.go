@@ -77,13 +77,6 @@ var RootCmd = &cobra.Command{
 			hook := errorOnWarningHook{}
 			log.AddHook(hook)
 		}
-
-		// Error out of the user has not chosen Kubernetes or OpenShift
-		provider := strings.ToLower(GlobalProvider)
-		if provider != "kubernetes" && provider != "openshift" {
-			log.Fatalf("%s is an unsupported provider. Supported providers are: 'kubernetes', 'openshift'.", GlobalProvider)
-		}
-
 	},
 }
 
@@ -101,7 +94,7 @@ func init() {
 	RootCmd.PersistentFlags().BoolVar(&GlobalErrorOnWarning, "error-on-warning", false, "Treat any warning as an error")
 	RootCmd.PersistentFlags().StringArrayVarP(&GlobalFiles, "file", "f", []string{}, "Specify an alternative compose file")
 	RootCmd.PersistentFlags().StringVarP(&GlobalBundle, "bundle", "b", "", "Specify a Distributed Application Bundle (DAB) file")
-	RootCmd.PersistentFlags().StringVar(&GlobalProvider, "provider", "kubernetes", "Specify a provider. Kubernetes or OpenShift.")
+	RootCmd.PersistentFlags().StringVar(&GlobalProvider, "provider", "kubernetes", "Specify a provider. Kubernetes is the only supported provider")
 
 	// Mark DAB / bundle as deprecated, see issue: https://github.com/rdeusser/kompose/issues/390
 	// As DAB is still EXPERIMENTAL

@@ -1,5 +1,5 @@
 # Fabric8 Maven Plugin + Kompose:
-Let's deploy a Springboot Java application with Docker Compose file using Fabric8 Maven Plugin to Kubernetes or OpenShift.
+Let's deploy a Springboot Java application with Docker Compose file using Fabric8 Maven Plugin to Kubernetes.
 
 ##### Requirements
 * Linux or MacOS or Windows
@@ -52,19 +52,19 @@ __4. Configure Fabric8 Maven Plugin to use a Docker Compose file__
 
 Add the `<configuration>` and `<executions>` sections to `pom.xml` as shown in above `pom.xml` snippet. Update the `<composeFile>` to provide the relative path of Docker Compose file from `pom.xml`
 
-__5. Deploy application on Kubernetes or OpenShift__
+__5. Deploy application on Kubernetes__
 
- Make sure that Kubernetes/OpenShift cluster or Minikube/minishift is running. In case, if anything of this is not running, you can run minishift to test this application by using following command. 
+ Make sure that Kubernetes cluster or Minikube is running. In case, if anything of this is not running, you can run minikube to test this application by using following command. 
 ```bash
-$ minishift start
+$ minikube start
 ```
 
- Below command deploys this application on Kubernetes or OpenShift.
+ Below command deploys this application on Kubernetes.
 ```bash
 $ mvn fabric8:deploy  
 ```
 
-Now that your service has been deployed, let's access it by querying `pod`, `service` from Kubernetes or OpenShift.
+Now that your service has been deployed, let's access it by querying `pod`, `service` from Kubernetes.
 ```bash
 $ oc get pods
 NAME                                    READY     STATUS      RESTARTS   AGE
@@ -80,7 +80,7 @@ springboot-docker-compose   172.30.205.137   <none>        8080/TCP   6m
 
 Let's access the Springboot service.
 ```bash
-$ minishift openshift service --in-browser springboot-docker-compose
+$ minikube service --in-browser springboot-docker-compose
 Created the new window in existing browser session.
 ```
 

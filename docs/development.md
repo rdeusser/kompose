@@ -100,15 +100,9 @@ glide-vc -h
    Then run `glide-vc --only-code --no-tests` to delete all unnecessary files from vendor.
 
 
-##### Updating Kubernetes and OpenShift
-Kubernetes version depends on what version is OpenShift using.
-OpenShift is using forked Kubernetes to carry some patches.
-Currently it is not possible to use different Kubernetes version from version that OpenShift uses.
-(for more see comments in `glide.yml`)
-
 ### Adding CLI tests
 
-[Kompose CLI tests](https://github.com/kubernetes/kompose/tree/master/script/test/cmd) run `kompose convert` with docker-compose files, and cross-check the k8s and OpenShift artifacts generated with the template files.
+[Kompose CLI tests](https://github.com/kubernetes/kompose/tree/master/script/test/cmd) run `kompose convert` with docker-compose files, and cross-check the Kubernetes artifacts generated with the template files.
 
 To generate CLI tests, please run `make gen-cmd`.
 

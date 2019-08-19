@@ -3,13 +3,11 @@
 * TOC
 {:toc}
 
-Kompose has support for two providers: OpenShift and Kubernetes.
-You can choose a targeted provider using global option `--provider`. If no provider is specified, Kubernetes is set by default.
-
+Kompose has support for Kubernetes as the only provider.
 
 ## Kompose Convert
 
-Kompose supports conversion of V1, V2, and V3 Docker Compose files into Kubernetes and OpenShift objects.
+Kompose supports conversion of V1, V2, and V3 Docker Compose files into Kubernetes objects.
 
 ### Kubernetes
 
@@ -58,43 +56,9 @@ redis-master-deployment.yaml
 
 When multiple docker-compose files are provided the configuration is merged. Any configuration that is common will be over ridden by subsequent file.
  
-### OpenShift
-
-```sh
-$ kompose --provider openshift --file docker-voting.yml convert
-WARN [worker] Service cannot be created because of missing port.
-INFO OpenShift file "vote-service.yaml" created             
-INFO OpenShift file "db-service.yaml" created               
-INFO OpenShift file "redis-service.yaml" created            
-INFO OpenShift file "result-service.yaml" created           
-INFO OpenShift file "vote-deploymentconfig.yaml" created    
-INFO OpenShift file "vote-imagestream.yaml" created         
-INFO OpenShift file "worker-deploymentconfig.yaml" created  
-INFO OpenShift file "worker-imagestream.yaml" created       
-INFO OpenShift file "db-deploymentconfig.yaml" created      
-INFO OpenShift file "db-imagestream.yaml" created           
-INFO OpenShift file "redis-deploymentconfig.yaml" created   
-INFO OpenShift file "redis-imagestream.yaml" created        
-INFO OpenShift file "result-deploymentconfig.yaml" created  
-INFO OpenShift file "result-imagestream.yaml" created  
-```
-
-It also supports creating buildconfig for build directive in a service. By default, it uses the remote repo for the current git branch as the source repo, and the current branch as the source branch for the build. You can specify a different source repo and branch using ``--build-repo`` and ``--build-branch`` options respectively.
-
-```sh
-$ kompose --provider openshift --file buildconfig/docker-compose.yml convert
-WARN [foo] Service cannot be created because of missing port. 
-INFO OpenShift Buildconfig using git@github.com:rtnpro/kompose.git::master as source. 
-INFO OpenShift file "foo-deploymentconfig.yaml" created     
-INFO OpenShift file "foo-imagestream.yaml" created          
-INFO OpenShift file "foo-buildconfig.yaml" created 
-```
-
-**Note**: If you are manually pushing the Openshift artifacts using ``oc create -f``, you need to ensure that you push the imagestream artifact before the buildconfig artifact, to workaround this Openshift issue: https://github.com/openshift/origin/issues/4518 .
-
 ## Kompose Up
 
-Kompose supports a straightforward way to deploy your "composed" application to Kubernetes or OpenShift via `kompose up`.
+Kompose supports a straightforward way to deploy your "composed" application to Kubernetes via `kompose up`.
 
 
 ### Kubernetes
@@ -132,42 +96,6 @@ po/redis-slave-2504961300-nve7b    1/1           Running       0            4m
 Note:
 - You must have a running Kubernetes cluster with a pre-configured kubectl context.
 - Only deployments and services are generated and deployed to Kubernetes. If you need different kind of resources, use the 'kompose convert' and 'kubectl create -f' commands instead.
-
-### OpenShift
-```sh
-$ kompose --file ./examples/docker-guestbook.yml --provider openshift up
-We are going to create OpenShift DeploymentConfigs and Services for your Dockerized application.
-If you need different kind of resources, use the 'kompose convert' and 'oc create -f' commands instead.
-
-INFO Successfully created service: redis-slave    
-INFO Successfully created service: frontend       
-INFO Successfully created service: redis-master   
-INFO Successfully created deployment: redis-slave
-INFO Successfully created ImageStream: redis-slave
-INFO Successfully created deployment: frontend    
-INFO Successfully created ImageStream: frontend   
-INFO Successfully created deployment: redis-master
-INFO Successfully created ImageStream: redis-master
-
-Your application has been deployed to OpenShift. You can run 'oc get dc,svc,is' for details.
-
-$ oc get dc,svc,is
-NAME               REVISION                              DESIRED       CURRENT    TRIGGERED BY
-dc/frontend        0                                     1             0          config,image(frontend:v4)
-dc/redis-master    0                                     1             0          config,image(redis-master:e2e)
-dc/redis-slave     0                                     1             0          config,image(redis-slave:v1)
-NAME               CLUSTER-IP                            EXTERNAL-IP   PORT(S)    AGE
-svc/frontend       172.30.46.64                          <none>        80/TCP     8s
-svc/redis-master   172.30.144.56                         <none>        6379/TCP   8s
-svc/redis-slave    172.30.75.245                         <none>        6379/TCP   8s
-NAME               DOCKER REPO                           TAGS          UPDATED
-is/frontend        172.30.12.200:5000/fff/frontend                     
-is/redis-master    172.30.12.200:5000/fff/redis-master                 
-is/redis-slave     172.30.12.200:5000/fff/redis-slave    v1  
-```
-
-Note:
-- You must have a running OpenShift cluster with a pre-configured `oc` context (`oc login`)
 
 ## Kompose Down
 
@@ -220,16 +148,6 @@ INFO Successfully created Service: foo
 INFO Successfully created Deployment: foo         
 
 Your application has been deployed to Kubernetes. You can run 'kubectl get deployment,svc,pods,pvc' for details.
-```
-
-In order to disable the functionality, or choose to use BuildConfig generation (with OpenShift) `--build (local|build-config|none)` can be passed.
-
-```sh
-# Disable building/pushing Docker images
-$ kompose up --build none
-
-# Generate Build Config artifacts for OpenShift
-$ kompose up --provider openshift --build build-config
 ```
 
 ## Alternative Conversions
@@ -329,7 +247,6 @@ services:
 
 - `kompose.service.expose` defines if the service needs to be made accessible from outside the cluster or not. If the value is set to "true", the provider sets the endpoint automatically, and for any other value, the value is set as the hostname. If multiple ports are defined in a service, the first one is chosen to be the exposed.
     - For the Kubernetes provider, an ingress resource is created and it is assumed that an ingress controller has already been configured. If the value is set to a comma sepatated list, multiple hostnames are supported.
-    - For the OpenShift provider, a route is created.
 - `kompose.service.expose.tls-secret` provides the name of the TLS secret to use with the Kubernetes ingress controller. This requires kompose.service.expose to be set.
 
 For example:
@@ -455,7 +372,7 @@ services:
 
 #### Warning about Deployment Config's
 
-If the Docker Compose file has a volume specified for a service, the Deployment (Kubernetes) or DeploymentConfig (OpenShift) strategy is changed to "Recreate" instead of "RollingUpdate" (default). This is done to avoid multiple instances of a service from accessing a volume at the same time.
+If the Docker Compose file has a volume specified for a service, the Deployment strategy is changed to "Recreate" instead of "RollingUpdate" (default). This is done to avoid multiple instances of a service from accessing a volume at the same time.
 
 If the Docker Compose file has service name with `_` or `.` in it (eg.`web_service` or `web.service`), then it will be replaced by `-` and the service name will be renamed accordingly (eg.`web-service`). Kompose does this because "Kubernetes" doesn't allow `_` in object name.
 

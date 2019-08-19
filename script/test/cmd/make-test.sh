@@ -48,16 +48,8 @@ generate_k8s() {
     sed -i -e '/.*kompose.cmd.*:/ s/: .*/: "%CMD%"/' -e '/.*kompose.version.*:/ s/: .*/: "%VERSION%"/' ${TEST_DIR}/output-k8s.json
 }
 
-generate_os() {
-    ./kompose convert --provider=openshift -f $COMPOSE_FILE -j -o $TEST_DIR/output-os.json
-    sed -i -e '/.*kompose.cmd.*:/ s/: .*/: "%CMD%"/' -e '/.*kompose.version.*:/ s/: .*/: "%VERSION%"/' ${TEST_DIR}/output-os.json
-}
-
 # Generate k8s files
 generate_k8s
-
-# Generate OS files
-generate_os
 
 cat >> $KOMPOSE_ROOT/script/test/cmd/tests.sh <<EOF
 
@@ -65,9 +57,4 @@ cat >> $KOMPOSE_ROOT/script/test/cmd/tests.sh <<EOF
 cmd="kompose -f \$KOMPOSE_ROOT/${COMPOSE_FILE} convert --stdout -j"
 sed -e "s;%VERSION%;\$version;g" -e  "s;%CMD%;\$cmd;g"  \$KOMPOSE_ROOT/${TEST_DIR}/output-k8s.json > /tmp/output-k8s.json
 convert::expect_success "kompose -f \$KOMPOSE_ROOT/$COMPOSE_FILE convert --stdout -j"
-# OpenShift test
-cmd="kompose --provider=openshift -f \$KOMPOSE_ROOT/${COMPOSE_FILE} convert --stdout -j"
-sed -e "s;%VERSION%;\$version;g" -e  "s;%CMD%;\$cmd;g"  \$KOMPOSE_ROOT/${TEST_DIR}/output-os.json > /tmp/output-os.json
-convert::expect_success "kompose --provider=openshift -f \$KOMPOSE_ROOT/$COMPOSE_FILE convert --stdout -j"
-
 EOF

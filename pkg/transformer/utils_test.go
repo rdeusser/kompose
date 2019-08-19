@@ -23,9 +23,6 @@ import (
 )
 
 func TestFormatProviderName(t *testing.T) {
-	if formatProviderName("openshift") != "OpenShift" {
-		t.Errorf("Got %s, expected OpenShift", formatProviderName("openshift"))
-	}
 	if formatProviderName("kubernetes") != "Kubernetes" {
 		t.Errorf("Got %s, expected Kubernetes", formatProviderName("kubernetes"))
 	}

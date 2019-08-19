@@ -115,19 +115,8 @@ func init() {
 	convertCmd.Flags().MarkHidden("replication-controller")
 	convertCmd.Flags().MarkHidden("deployment")
 
-	// OpenShift only
-	convertCmd.Flags().BoolVar(&ConvertDeploymentConfig, "deployment-config", true, "Generate an OpenShift deploymentconfig object")
-	convertCmd.Flags().BoolVar(&ConvertInsecureRepo, "insecure-repository", false, "Use an insecure Docker repository for OpenShift ImageStream")
-	convertCmd.Flags().StringVar(&ConvertBuildRepo, "build-repo", "", "Specify source repository for buildconfig (default remote origin)")
-	convertCmd.Flags().StringVar(&ConvertBuildBranch, "build-branch", "", "Specify repository branch to use for buildconfig (default master)")
-	convertCmd.Flags().MarkDeprecated("deployment-config", "use --controller")
-	convertCmd.Flags().MarkHidden("deployment-config")
-	convertCmd.Flags().MarkHidden("insecure-repository")
-	convertCmd.Flags().MarkHidden("build-repo")
-	convertCmd.Flags().MarkHidden("build-branch")
-
 	// Standard between the two
-	convertCmd.Flags().StringVar(&ConvertBuild, "build", "none", `Set the type of build ("local"|"build-config"(OpenShift only)|"none")`)
+	convertCmd.Flags().StringVar(&ConvertBuild, "build", "none", `Set the type of build ("local"|"none")`)
 	convertCmd.Flags().BoolVarP(&ConvertYaml, "yaml", "y", false, "Generate resource files into YAML format")
 	convertCmd.Flags().MarkDeprecated("yaml", "YAML is the default format now.")
 	convertCmd.Flags().MarkShorthandDeprecated("y", "YAML is the default format now.")
@@ -140,45 +129,6 @@ func init() {
 	// Deprecated commands
 	convertCmd.Flags().BoolVar(&ConvertEmptyVols, "emptyvols", false, "Use Empty Volumes. Do not generate PVCs")
 	convertCmd.Flags().MarkDeprecated("emptyvols", "emptyvols has been marked as deprecated. Use --volumes empty")
-
-	// In order to 'separate' both OpenShift and Kubernetes only flags. A custom help page is created
-	customHelp := `Usage:{{if .Runnable}}
-  {{if .HasAvailableFlags}}{{appendIfNotPresent .UseLine "[flags]"}}{{else}}{{.UseLine}}{{end}}{{end}}{{if .HasAvailableSubCommands}}
-  {{ .CommandPath}} [command]{{end}}{{if gt .Aliases 0}}
-
-Aliases:
-  {{.NameAndAliases}}
-{{end}}{{if .HasExample}}
-
-Examples:
-{{ .Example }}{{end}}{{ if .HasAvailableSubCommands}}
-Available Commands:{{range .Commands}}{{if .IsAvailableCommand}}
-  {{rpad .Name .NamePadding }} {{.Short}}{{end}}{{end}}{{end}}{{ if .HasAvailableLocalFlags}}
-
-Kubernetes Flags:
-      --daemon-set               Generate a Kubernetes daemonset object (deprecated, use --controller instead)
-  -d, --deployment               Generate a Kubernetes deployment object (deprecated, use --controller instead)
-  -c, --chart                    Create a Helm chart for converted objects
-      --replication-controller   Generate a Kubernetes replication controller object (deprecated, use --controller instead)
-
-OpenShift Flags:
-      --build-branch             Specify repository branch to use for buildconfig (default is current branch name)
-      --build-repo               Specify source repository for buildconfig (default is current branch's remote url)
-      --deployment-config        Generate an OpenShift deployment config object
-      --insecure-repository      Specify to use insecure docker repository while generating Openshift image stream object
-
-Flags:
-{{.LocalFlags.FlagUsages | trimRightSpace}}{{end}}{{ if .HasAvailableInheritedFlags}}
-
-Global Flags:
-{{.InheritedFlags.FlagUsages | trimRightSpace}}{{end}}{{if .HasHelpSubCommands}}
-
-Additional help topics:{{range .Commands}}{{if .IsHelpCommand}}
-  {{rpad .CommandPath .CommandPathPadding}} {{.Short}}{{end}}{{end}}{{end}}{{ if .HasAvailableSubCommands }}
-Use "{{.CommandPath}} [command] --help" for more information about a command.{{end}}
-`
-	// Set the help template + add the command to root
-	convertCmd.SetUsageTemplate(customHelp)
 
 	RootCmd.AddCommand(convertCmd)
 }

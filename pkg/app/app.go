@@ -17,6 +17,7 @@ limitations under the License.
 package app
 
 import (
+	"os"
 	"strings"
 
 	log "github.com/sirupsen/logrus"
@@ -26,19 +27,12 @@ import (
 	_ "k8s.io/kubernetes/pkg/api/install"
 	_ "k8s.io/kubernetes/pkg/apis/extensions/install"
 
-	// install OpenShift api
-	_ "github.com/openshift/origin/pkg/build/api/install"
-	_ "github.com/openshift/origin/pkg/deploy/api/install"
-	_ "github.com/openshift/origin/pkg/image/api/install"
-	_ "github.com/openshift/origin/pkg/route/api/install"
 
-	"os"
 
 	"github.com/rdeusser/kompose/pkg/kobject"
 	"github.com/rdeusser/kompose/pkg/loader"
 	"github.com/rdeusser/kompose/pkg/transformer"
 	"github.com/rdeusser/kompose/pkg/transformer/kubernetes"
-	"github.com/rdeusser/kompose/pkg/transformer/openshift"
 )
 
 const (
@@ -49,8 +43,6 @@ const (
 const (
 	// ProviderKubernetes is provider kubernetes
 	ProviderKubernetes = "kubernetes"
-	// ProviderOpenshift is provider openshift
-	ProviderOpenshift = "openshift"
 	// DefaultProvider - provider that will be used if there is no provider was explicitly set
 	DefaultProvider = ProviderKubernetes
 )
@@ -72,11 +64,6 @@ func ValidateFlags(bundle string, args []string, cmd *cobra.Command, opt *kobjec
 	provider := cmd.Flags().Lookup("provider").Value.String()
 	log.Debugf("Checking validation of provider: %s", provider)
 
-	// OpenShift specific flags
-	deploymentConfig := cmd.Flags().Lookup("deployment-config").Changed
-	buildRepo := cmd.Flags().Lookup("build-repo").Changed
-	buildBranch := cmd.Flags().Lookup("build-branch").Changed
-
 	// Kubernetes specific flags
 	chart := cmd.Flags().Lookup("chart").Changed
 	daemonSet := cmd.Flags().Lookup("daemon-set").Changed
@@ -87,38 +74,6 @@ func ValidateFlags(bundle string, args []string, cmd *cobra.Command, opt *kobjec
 	controller := opt.Controller
 	log.Debugf("Checking validation of controller: %s", controller)
 
-	// Check validations against provider flags
-	switch {
-	case provider == ProviderOpenshift:
-		if chart {
-			log.Fatalf("--chart, -c is a Kubernetes only flag")
-		}
-		if daemonSet {
-			log.Fatalf("--daemon-set is a Kubernetes only flag")
-		}
-		if replicationController {
-			log.Fatalf("--replication-controller is a Kubernetes only flag")
-		}
-		if deployment {
-			log.Fatalf("--deployment, -d is a Kubernetes only flag")
-		}
-		if controller == "daemonset" || controller == "replicationcontroller" || controller == "deployment" {
-			log.Fatalf("--controller= daemonset, replicationcontroller or deployment is a Kubernetes only flag")
-		}
-	case provider == ProviderKubernetes:
-		if deploymentConfig {
-			log.Fatalf("--deployment-config is an OpenShift only flag")
-		}
-		if buildRepo {
-			log.Fatalf("--build-repo is an Openshift only flag")
-		}
-		if buildBranch {
-			log.Fatalf("--build-branch is an Openshift only flag")
-		}
-		if controller == "deploymentconfig" {
-			log.Fatalf("--controller=deploymentConfig is an OpenShift only flag")
-		}
-	}
 
 	// Standard checks regardless of provider
 	if len(opt.OutFile) != 0 && opt.ToStdout {
@@ -194,24 +149,6 @@ func validateControllers(opt *kobject.ConvertOptions) {
 			}
 			if count > 1 {
 				log.Fatalf("Error: only one kind of Kubernetes resource can be generated when --out or --stdout is specified")
-			}
-		}
-
-	} else if opt.Provider == ProviderOpenshift {
-		// create deploymentconfig by default if no controller has been set
-		if !opt.CreateDeploymentConfig {
-			opt.CreateDeploymentConfig = true
-		}
-		if singleOutput {
-			count := 0
-			if opt.CreateDeploymentConfig {
-				count++
-			}
-			// Add more controllers here once they are available in OpenShift
-			// if opt.foo {count++}
-
-			if count > 1 {
-				log.Fatalf("Error: only one kind of OpenShift resource can be generated when --out or --stdout is specified")
 			}
 		}
 	}
@@ -318,13 +255,9 @@ func Down(opt kobject.ConvertOptions) {
 // what provider we are using.
 func getTransformer(opt kobject.ConvertOptions) transformer.Transformer {
 	var t transformer.Transformer
-	if opt.Provider == DefaultProvider {
+	if opt.Provider == DefaultProvider || opt.Provider == ProviderKubernetes {
 		// Create/Init new Kubernetes object with CLI opts
 		t = &kubernetes.Kubernetes{Opt: opt}
-	} else {
-		// Create/Init new OpenShift object that is initialized with a newly
-		// created Kubernetes object. Openshift inherits from Kubernetes
-		t = &openshift.OpenShift{Kubernetes: kubernetes.Kubernetes{Opt: opt}}
 	}
 	return t
 }

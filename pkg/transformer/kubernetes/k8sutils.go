@@ -43,8 +43,7 @@ import (
 
 	"sort"
 
-	deployapi "github.com/openshift/origin/pkg/deploy/api"
-	"github.com/pkg/errors"
+		"github.com/pkg/errors"
 	"k8s.io/kubernetes/pkg/api/resource"
 )
 
@@ -554,8 +553,6 @@ func (k *Kubernetes) UpdateKubernetesObjects(name string, service kobject.Servic
 			switch objType := obj.(type) {
 			case *extensions.Deployment:
 				objType.Spec.Strategy.Type = extensions.RecreateDeploymentStrategyType
-			case *deployapi.DeploymentConfig:
-				objType.Spec.Strategy.Type = deployapi.DeploymentStrategyTypeRecreate
 			}
 		}
 	}
