@@ -29,12 +29,12 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	// install kubernetes api
-	_ "k8s.io/kubernetes/pkg/api/install"
+	_ "k8s.io/api/install"
 	_ "k8s.io/kubernetes/pkg/apis/extensions/install"
 
-	"k8s.io/kubernetes/pkg/api"
-	"k8s.io/kubernetes/pkg/api/resource"
-	"k8s.io/kubernetes/pkg/api/unversioned"
+	"k8s.io/api"
+	"k8s.io/api/resource"
+	"k8s.io/api/unversioned"
 	"k8s.io/kubernetes/pkg/apis/extensions"
 
 	client "k8s.io/kubernetes/pkg/client/unversioned"
@@ -43,15 +43,17 @@ import (
 
 	"k8s.io/kubernetes/pkg/runtime"
 	"k8s.io/kubernetes/pkg/util/intstr"
+
 	//"k8s.io/kubernetes/pkg/controller/daemon"
 	"sort"
 	"strings"
 
-	"github.com/rdeusser/kompose/pkg/loader/compose"
-	"github.com/pkg/errors"
-	"k8s.io/kubernetes/pkg/api/meta"
-	"k8s.io/kubernetes/pkg/labels"
 	"path/filepath"
+
+	"github.com/pkg/errors"
+	"github.com/rdeusser/kompose/pkg/loader/compose"
+	"k8s.io/api/meta"
+	"k8s.io/kubernetes/pkg/labels"
 )
 
 // Kubernetes implements Transformer interface and represents Kubernetes transformer

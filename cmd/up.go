@@ -19,10 +19,11 @@ package cmd
 import (
 	log "github.com/sirupsen/logrus"
 
+	"strings"
+
 	"github.com/rdeusser/kompose/pkg/app"
 	"github.com/rdeusser/kompose/pkg/kobject"
 	"github.com/spf13/cobra"
-	"strings"
 )
 
 // TODO: comment

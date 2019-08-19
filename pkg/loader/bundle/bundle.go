@@ -24,11 +24,11 @@ import (
 	"reflect"
 	"strings"
 
-	"k8s.io/kubernetes/pkg/api"
+	"k8s.io/api"
 
 	"github.com/fatih/structs"
-	"github.com/rdeusser/kompose/pkg/kobject"
 	"github.com/pkg/errors"
+	"github.com/rdeusser/kompose/pkg/kobject"
 	log "github.com/sirupsen/logrus"
 )
 

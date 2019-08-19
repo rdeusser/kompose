@@ -19,7 +19,7 @@ package kobject
 import (
 	dockerCliTypes "github.com/docker/cli/cli/compose/types"
 	"github.com/docker/libcompose/yaml"
-	"k8s.io/kubernetes/pkg/api"
+	"k8s.io/api"
 )
 
 // KomposeObject holds the generic struct of Kompose transformation

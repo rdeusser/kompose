@@ -24,10 +24,8 @@ import (
 	"github.com/spf13/cobra"
 
 	// install kubernetes api
-	_ "k8s.io/kubernetes/pkg/api/install"
+	_ "k8s.io/api/install"
 	_ "k8s.io/kubernetes/pkg/apis/extensions/install"
-
-
 
 	"github.com/rdeusser/kompose/pkg/kobject"
 	"github.com/rdeusser/kompose/pkg/loader"
@@ -73,7 +71,6 @@ func ValidateFlags(bundle string, args []string, cmd *cobra.Command, opt *kobjec
 	// Get the controller
 	controller := opt.Controller
 	log.Debugf("Checking validation of controller: %s", controller)
-
 
 	// Standard checks regardless of provider
 	if len(opt.OutFile) != 0 && opt.ToStdout {

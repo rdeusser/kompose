@@ -24,14 +24,14 @@ import (
 	"strconv"
 	"strings"
 
-	"k8s.io/kubernetes/pkg/api"
+	"k8s.io/api"
 
 	"github.com/docker/libcompose/config"
 	"github.com/docker/libcompose/lookup"
 	"github.com/docker/libcompose/project"
+	"github.com/pkg/errors"
 	"github.com/rdeusser/kompose/pkg/kobject"
 	"github.com/rdeusser/kompose/pkg/transformer"
-	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 )
 

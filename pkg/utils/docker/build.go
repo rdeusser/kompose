@@ -18,14 +18,15 @@ package docker
 
 import (
 	"bytes"
-	dockerlib "github.com/fsouza/go-dockerclient"
-	"github.com/rdeusser/kompose/pkg/utils/archive"
-	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"os"
 	"path"
 	"strings"
+
+	dockerlib "github.com/fsouza/go-dockerclient"
+	"github.com/pkg/errors"
+	"github.com/rdeusser/kompose/pkg/utils/archive"
+	log "github.com/sirupsen/logrus"
 )
 
 // Build will provide methods for interaction with API regarding building images

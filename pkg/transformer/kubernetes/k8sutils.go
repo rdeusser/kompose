@@ -36,15 +36,15 @@ import (
 	"github.com/rdeusser/kompose/pkg/transformer"
 	log "github.com/sirupsen/logrus"
 
-	"k8s.io/kubernetes/pkg/api"
-	"k8s.io/kubernetes/pkg/api/unversioned"
+	"k8s.io/api"
+	"k8s.io/api/unversioned"
 	"k8s.io/kubernetes/pkg/apis/extensions"
 	"k8s.io/kubernetes/pkg/runtime"
 
 	"sort"
 
-		"github.com/pkg/errors"
-	"k8s.io/kubernetes/pkg/api/resource"
+	"github.com/pkg/errors"
+	"k8s.io/api/resource"
 )
 
 /**

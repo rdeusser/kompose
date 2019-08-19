@@ -23,9 +23,9 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/rdeusser/kompose/pkg/kobject"
 	"github.com/pkg/errors"
-	"k8s.io/kubernetes/pkg/api"
+	"github.com/rdeusser/kompose/pkg/kobject"
+	"k8s.io/api"
 )
 
 const (

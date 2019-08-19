@@ -19,7 +19,6 @@ package cmd
 import (
 	"fmt"
 	"os"
-	"strings"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"

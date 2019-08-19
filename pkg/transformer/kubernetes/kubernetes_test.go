@@ -24,10 +24,11 @@ import (
 	"github.com/rdeusser/kompose/pkg/kobject"
 	"github.com/rdeusser/kompose/pkg/transformer"
 
-	"github.com/pkg/errors"
-	"k8s.io/kubernetes/pkg/api"
-	"k8s.io/kubernetes/pkg/apis/extensions"
 	"strings"
+
+	"github.com/pkg/errors"
+	"k8s.io/api"
+	"k8s.io/kubernetes/pkg/apis/extensions"
 )
 
 func newServiceConfig() kobject.ServiceConfig {

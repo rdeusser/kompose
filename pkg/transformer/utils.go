@@ -34,7 +34,7 @@ import (
 	"github.com/rdeusser/kompose/pkg/version"
 
 	"github.com/pkg/errors"
-	"k8s.io/kubernetes/pkg/api"
+	"k8s.io/api"
 )
 
 // Selector used as labels and selector
@@ -164,7 +164,7 @@ func Print(name, path string, trailing string, data []byte, toStdout, generateJS
 }
 
 func formatProviderName(provider string) string {
-	} else if strings.EqualFold(provider, "kubernetes") {
+	if strings.EqualFold(provider, "kubernetes") {
 		return "Kubernetes"
 	}
 	return provider

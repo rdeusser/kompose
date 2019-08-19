@@ -25,8 +25,8 @@ import (
 
 	"github.com/docker/libcompose/project"
 	"github.com/fatih/structs"
-	"github.com/rdeusser/kompose/pkg/kobject"
 	"github.com/pkg/errors"
+	"github.com/rdeusser/kompose/pkg/kobject"
 	log "github.com/sirupsen/logrus"
 )
 
