@@ -23,8 +23,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/kubernetes/kompose/pkg/kobject"
-	"github.com/kubernetes/kompose/pkg/testutils"
+	"github.com/rdeusser/kompose/pkg/kobject"
+	"github.com/rdeusser/kompose/pkg/testutils"
 
 	"reflect"
 

@@ -23,7 +23,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/kubernetes/kompose/pkg/kobject"
+	"github.com/rdeusser/kompose/pkg/kobject"
 	"github.com/pkg/errors"
 	"k8s.io/kubernetes/pkg/api"
 )

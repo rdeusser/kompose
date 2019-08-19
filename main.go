@@ -16,7 +16,7 @@ limitations under the License.
 
 package main
 
-import "github.com/kubernetes/kompose/cmd"
+import "github.com/rdeusser/kompose/cmd"
 
 func main() {
 	cmd.Execute()

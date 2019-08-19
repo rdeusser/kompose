@@ -19,9 +19,9 @@ package loader
 import (
 	"fmt"
 
-	"github.com/kubernetes/kompose/pkg/kobject"
-	"github.com/kubernetes/kompose/pkg/loader/bundle"
-	"github.com/kubernetes/kompose/pkg/loader/compose"
+	"github.com/rdeusser/kompose/pkg/kobject"
+	"github.com/rdeusser/kompose/pkg/loader/bundle"
+	"github.com/rdeusser/kompose/pkg/loader/compose"
 )
 
 // Loader interface defines loader that loads files and converts it to kobject representation

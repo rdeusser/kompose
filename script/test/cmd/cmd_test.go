@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-var ProjectPath = "$GOPATH/src/github.com/kubernetes/kompose/"
+var ProjectPath = "$GOPATH/src/github.com/rdeusser/kompose/"
 var BinaryLocation = os.ExpandEnv(ProjectPath + "kompose")
 
 func Test_stdin(t *testing.T) {

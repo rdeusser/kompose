@@ -19,7 +19,7 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/kubernetes/kompose/pkg/version"
+	"github.com/rdeusser/kompose/pkg/version"
 	"github.com/spf13/cobra"
 )
 
