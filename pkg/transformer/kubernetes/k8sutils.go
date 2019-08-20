@@ -36,15 +36,15 @@ import (
 	"github.com/rdeusser/kompose/pkg/transformer"
 	log "github.com/sirupsen/logrus"
 
-	"k8s.io/api"
-	"k8s.io/api/unversioned"
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/kubernetes/pkg/apis/extensions"
-	"k8s.io/kubernetes/pkg/runtime"
 
 	"sort"
 
 	"github.com/pkg/errors"
-	"k8s.io/api/resource"
+	"k8s.io/apimachinery/pkg/api/resource"
 )
 
 /**
@@ -175,10 +175,10 @@ func PrintList(objects []runtime.Object, opt kobject.ConvertOptions) error {
 	// if asked to print to stdout or to put in single file
 	// we will create a list
 	if opt.ToStdout || f != nil {
-		list := &api.List{}
+		list := &corev1.List{}
 		// convert objects to versioned and add them to list
 		for _, object := range objects {
-			versionedObject, err := convertToVersion(object, unversioned.GroupVersion{})
+			versionedObject, err := convertToVersion(object, metav1.GroupVersion{})
 			if err != nil {
 				return err
 			}
@@ -187,7 +187,7 @@ func PrintList(objects []runtime.Object, opt kobject.ConvertOptions) error {
 
 		}
 		// version list itself
-		listVersion := unversioned.GroupVersion{Group: "", Version: "v1"}
+		listVersion := metav1.GroupVersion{Group: "", Version: "v1"}
 		convertedList, err := convertToVersion(list, listVersion)
 		if err != nil {
 			return err
@@ -214,7 +214,7 @@ func PrintList(objects []runtime.Object, opt kobject.ConvertOptions) error {
 		var file string
 		// create a separate file for each provider
 		for _, v := range objects {
-			versionedObject, err := convertToVersion(v, unversioned.GroupVersion{})
+			versionedObject, err := convertToVersion(v, metav1.GroupVersion{})
 			if err != nil {
 				return err
 			}
@@ -229,8 +229,8 @@ func PrintList(objects []runtime.Object, opt kobject.ConvertOptions) error {
 			typeMeta := val.FieldByName("TypeMeta").Interface().(unversioned.TypeMeta)
 
 			// Use reflect to access ObjectMeta struct inside runtime.Object.
-			// cast it to correct type - api.ObjectMeta
-			objectMeta := val.FieldByName("ObjectMeta").Interface().(api.ObjectMeta)
+			// cast it to correct type - metav1.ObjectMeta
+			objectMeta := val.FieldByName("ObjectMeta").Interface().(metav1.ObjectMeta)
 
 			file, err = transformer.Print(objectMeta.Name, finalDirName, strings.ToLower(typeMeta.Kind), data, opt.ToStdout, opt.GenerateJSON, f, opt.Provider)
 			if err != nil {
@@ -264,18 +264,18 @@ func marshal(obj runtime.Object, jsonFormat bool) (data []byte, err error) {
 }
 
 // Convert object to versioned object
-// if groupVersion is  empty (unversioned.GroupVersion{}), use version from original object (obj)
-func convertToVersion(obj runtime.Object, groupVersion unversioned.GroupVersion) (runtime.Object, error) {
+// if groupVersion is  empty (metav1.GroupVersion{}), use version from original object (obj)
+func convertToVersion(obj runtime.Object, groupVersion metav1.GroupVersion) (runtime.Object, error) {
 
-	var version unversioned.GroupVersion
+	var version metav1.GroupVersion
 
 	if groupVersion.Empty() {
 		objectVersion := obj.GetObjectKind().GroupVersionKind()
-		version = unversioned.GroupVersion{Group: objectVersion.Group, Version: objectVersion.Version}
+		version = metav1.GroupVersion{Group: objectVersion.Group, Version: objectVersion.Version}
 	} else {
 		version = groupVersion
 	}
-	convertedObject, err := api.Scheme.ConvertToVersion(obj, version)
+	convertedObject, err := corev1.Scheme.ConvertToVersion(obj, version)
 	if err != nil {
 		return nil, err
 	}
@@ -288,7 +288,7 @@ func (k *Kubernetes) PortsExist(service kobject.ServiceConfig) bool {
 }
 
 // CreateService creates a k8s service
-func (k *Kubernetes) CreateService(name string, service kobject.ServiceConfig, objects []runtime.Object) *api.Service {
+func (k *Kubernetes) CreateService(name string, service kobject.ServiceConfig, objects []runtime.Object) *corev1.Service {
 	svc := k.InitSvc(name, service)
 
 	// Configure the service ports.
@@ -296,10 +296,10 @@ func (k *Kubernetes) CreateService(name string, service kobject.ServiceConfig, o
 	svc.Spec.Ports = servicePorts
 
 	if service.ServiceType == "Headless" {
-		svc.Spec.Type = api.ServiceTypeClusterIP
+		svc.Spec.Type = corev1.ServiceTypeClusterIP
 		svc.Spec.ClusterIP = "None"
 	} else {
-		svc.Spec.Type = api.ServiceType(service.ServiceType)
+		svc.Spec.Type = corev1.ServiceType(service.ServiceType)
 	}
 
 	// Configure annotations
@@ -314,12 +314,12 @@ func (k *Kubernetes) CreateService(name string, service kobject.ServiceConfig, o
 // and without Service Pods can't find each other using DNS names.
 // Instead of regular Kubernetes Service we create Headless Service. DNS of such service points directly to Pod IP address.
 // You can find more about Headless Services in Kubernetes documentation https://kubernetes.io/docs/user-guide/services/#headless-services
-func (k *Kubernetes) CreateHeadlessService(name string, service kobject.ServiceConfig, objects []runtime.Object) *api.Service {
+func (k *Kubernetes) CreateHeadlessService(name string, service kobject.ServiceConfig, objects []runtime.Object) *corev1.Service {
 	svc := k.InitSvc(name, service)
 
-	servicePorts := []api.ServicePort{}
+	servicePorts := []corev1.ServicePort{}
 	// Configure a dummy port: https://github.com/kubernetes/kubernetes/issues/32766.
-	servicePorts = append(servicePorts, api.ServicePort{
+	servicePorts = append(servicePorts, corev1.ServicePort{
 		Name: "headless",
 		Port: 55555,
 	})
@@ -377,7 +377,7 @@ func (k *Kubernetes) UpdateKubernetesObjects(name string, service kobject.Servic
 	annotations := transformer.ConfigAnnotations(service)
 
 	// fillTemplate fills the pod template with the value calculated from config
-	fillTemplate := func(template *api.PodTemplateSpec) error {
+	fillTemplate := func(template *corev1.PodTemplateSpec) error {
 		if len(service.ContainerName) > 0 {
 			template.Spec.Containers[0].Name = FormatContainerName(service.ContainerName)
 		}
@@ -393,11 +393,11 @@ func (k *Kubernetes) UpdateKubernetesObjects(name string, service kobject.Servic
 		// Configure the HealthCheck
 		// We check to see if it's blank
 		if !reflect.DeepEqual(service.HealthChecks, kobject.HealthCheck{}) {
-			probe := api.Probe{}
+			probe := corev1.Probe{}
 
 			if len(service.HealthChecks.Test) > 0 {
-				probe.Handler = api.Handler{
-					Exec: &api.ExecAction{
+				probe.Handler = corev1.Handler{
+					Exec: &corev1.ExecAction{
 						Command: service.HealthChecks.Test,
 					},
 				}
@@ -426,14 +426,14 @@ func (k *Kubernetes) UpdateKubernetesObjects(name string, service kobject.Servic
 
 		// Configure the resource limits
 		if service.MemLimit != 0 || service.CPULimit != 0 {
-			resourceLimit := api.ResourceList{}
+			resourceLimit := corev1.ResourceList{}
 
 			if service.MemLimit != 0 {
-				resourceLimit[api.ResourceMemory] = *resource.NewQuantity(int64(service.MemLimit), "RandomStringForFormat")
+				resourceLimit[corev1.ResourceMemory] = *resource.NewQuantity(int64(service.MemLimit), "RandomStringForFormat")
 			}
 
 			if service.CPULimit != 0 {
-				resourceLimit[api.ResourceCPU] = *resource.NewMilliQuantity(service.CPULimit, resource.DecimalSI)
+				resourceLimit[corev1.ResourceCPU] = *resource.NewMilliQuantity(service.CPULimit, resource.DecimalSI)
 			}
 
 			template.Spec.Containers[0].Resources.Limits = resourceLimit
@@ -441,14 +441,14 @@ func (k *Kubernetes) UpdateKubernetesObjects(name string, service kobject.Servic
 
 		// Configure the resource requests
 		if service.MemReservation != 0 || service.CPUReservation != 0 {
-			resourceRequests := api.ResourceList{}
+			resourceRequests := corev1.ResourceList{}
 
 			if service.MemReservation != 0 {
-				resourceRequests[api.ResourceMemory] = *resource.NewQuantity(int64(service.MemReservation), "RandomStringForFormat")
+				resourceRequests[corev1.ResourceMemory] = *resource.NewQuantity(int64(service.MemReservation), "RandomStringForFormat")
 			}
 
 			if service.CPUReservation != 0 {
-				resourceRequests[api.ResourceCPU] = *resource.NewMilliQuantity(service.CPUReservation, resource.DecimalSI)
+				resourceRequests[corev1.ResourceCPU] = *resource.NewMilliQuantity(service.CPUReservation, resource.DecimalSI)
 			}
 
 			template.Spec.Containers[0].Resources.Requests = resourceRequests
@@ -456,7 +456,7 @@ func (k *Kubernetes) UpdateKubernetesObjects(name string, service kobject.Servic
 
 		// Configure resource reservations
 
-		podSecurityContext := &api.PodSecurityContext{}
+		podSecurityContext := &corev1.PodSecurityContext{}
 
 		//set pid namespace mode
 		if service.Pid != "" {
@@ -473,7 +473,7 @@ func (k *Kubernetes) UpdateKubernetesObjects(name string, service kobject.Servic
 		}
 
 		// Setup security context
-		securityContext := &api.SecurityContext{}
+		securityContext := &corev1.SecurityContext{}
 		if service.Privileged {
 			securityContext.Privileged = &service.Privileged
 		}
@@ -493,10 +493,10 @@ func (k *Kubernetes) UpdateKubernetesObjects(name string, service kobject.Servic
 		}
 
 		// update template only if securityContext is not empty
-		if *securityContext != (api.SecurityContext{}) {
+		if *securityContext != (corev1.SecurityContext{}) {
 			template.Spec.Containers[0].SecurityContext = securityContext
 		}
-		if !reflect.DeepEqual(*podSecurityContext, api.PodSecurityContext{}) {
+		if !reflect.DeepEqual(*podSecurityContext, corev1.PodSecurityContext{}) {
 			template.Spec.SecurityContext = podSecurityContext
 		}
 		template.Spec.Containers[0].Ports = ports
@@ -506,11 +506,11 @@ func (k *Kubernetes) UpdateKubernetesObjects(name string, service kobject.Servic
 		switch service.ImagePullPolicy {
 		case "":
 		case "Always":
-			template.Spec.Containers[0].ImagePullPolicy = api.PullAlways
+			template.Spec.Containers[0].ImagePullPolicy = corev1.PullAlways
 		case "Never":
-			template.Spec.Containers[0].ImagePullPolicy = api.PullNever
+			template.Spec.Containers[0].ImagePullPolicy = corev1.PullNever
 		case "IfNotPresent":
-			template.Spec.Containers[0].ImagePullPolicy = api.PullIfNotPresent
+			template.Spec.Containers[0].ImagePullPolicy = corev1.PullIfNotPresent
 		default:
 			return errors.New("Unknown image-pull-policy " + service.ImagePullPolicy + " for service " + name)
 		}
@@ -518,11 +518,11 @@ func (k *Kubernetes) UpdateKubernetesObjects(name string, service kobject.Servic
 		// Configure the container restart policy.
 		switch service.Restart {
 		case "", "always", "any":
-			template.Spec.RestartPolicy = api.RestartPolicyAlways
+			template.Spec.RestartPolicy = corev1.RestartPolicyAlways
 		case "no", "none":
-			template.Spec.RestartPolicy = api.RestartPolicyNever
+			template.Spec.RestartPolicy = corev1.RestartPolicyNever
 		case "on-failure":
-			template.Spec.RestartPolicy = api.RestartPolicyOnFailure
+			template.Spec.RestartPolicy = corev1.RestartPolicyOnFailure
 		default:
 			return errors.New("Unknown restart policy " + service.Restart + " for service " + name)
 		}
@@ -539,7 +539,7 @@ func (k *Kubernetes) UpdateKubernetesObjects(name string, service kobject.Servic
 	}
 
 	// fillObjectMeta fills the metadata with the value calculated from config
-	fillObjectMeta := func(meta *api.ObjectMeta) {
+	fillObjectMeta := func(meta *metav1.ObjectMeta) {
 		meta.Annotations = annotations
 	}
 

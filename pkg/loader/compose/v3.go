@@ -23,7 +23,7 @@ import (
 
 	libcomposeyaml "github.com/docker/libcompose/yaml"
 
-	"k8s.io/api"
+	corev1 "k8s.io/api/core/v1"
 
 	"github.com/docker/cli/cli/compose/loader"
 	"github.com/docker/cli/cli/compose/types"
@@ -192,7 +192,7 @@ func loadV3Ports(ports []types.ServicePortConfig) []kobject.Ports {
 			HostPort:      int32(port.Published),
 			ContainerPort: int32(port.Target),
 			HostIP:        "",
-			Protocol:      api.Protocol(strings.ToUpper(string(port.Protocol))),
+			Protocol:     corev1.Protocol(strings.ToUpper(string(port.Protocol))),
 		})
 
 	}
@@ -425,7 +425,7 @@ func dockerComposeToKomposeMapping(composeObject *types.Config) (kobject.Kompose
 		serviceConfig.Configs = composeServiceConfig.Configs
 		serviceConfig.ConfigsMetaData = composeObject.Configs
 		if composeServiceConfig.Deploy.EndpointMode == "vip" {
-			serviceConfig.ServiceType = string(api.ServiceTypeNodePort)
+			serviceConfig.ServiceType = string(corev1.ServiceTypeNodePort)
 		}
 		// Final step, add to the array!
 		komposeObject.ServiceConfigs[normalizeServiceNames(name)] = serviceConfig

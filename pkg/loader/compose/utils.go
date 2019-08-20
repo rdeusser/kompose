@@ -25,7 +25,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/rdeusser/kompose/pkg/kobject"
-	"k8s.io/api"
+	corev1 "k8s.io/api/core/v1"
 )
 
 const (
@@ -106,11 +106,11 @@ func getComposeFileDir(inputFiles []string) (string, error) {
 func handleServiceType(ServiceType string) (string, error) {
 	switch strings.ToLower(ServiceType) {
 	case "", "clusterip":
-		return string(api.ServiceTypeClusterIP), nil
+		return string(corev1.ServiceTypeClusterIP), nil
 	case "nodeport":
-		return string(api.ServiceTypeNodePort), nil
+		return string(corev1.ServiceTypeNodePort), nil
 	case "loadbalancer":
-		return string(api.ServiceTypeLoadBalancer), nil
+		return string(corev1.ServiceTypeLoadBalancer), nil
 	case "headless":
 		return ServiceTypeHeadless, nil
 	default:
